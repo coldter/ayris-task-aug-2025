@@ -10,7 +10,7 @@ export const getAllTestCasesGroupedByTestersResponseSchema = z.object({
       testCases: z.array(
         z.object({
           id: z.string(),
-          name: z.string(),
+          title: z.string(),
           testerUpdate: z.enum(testerUpdateEnum),
           supportUpdate: z.enum(supportUpdateEnum),
         }),
@@ -20,13 +20,14 @@ export const getAllTestCasesGroupedByTestersResponseSchema = z.object({
 });
 
 export const createTestCaseRequestSchema = z.object({
+  title: z.string(),
   testerIds: z.string().array().min(1),
   description: z.string(),
 });
 
 export const createTestCaseResponseSchema = z.object({
   id: z.string(),
-  description: z.string(),
+  title: z.string(),
   testerUpdate: z.enum(testerUpdateEnum),
   supportUpdate: z.enum(supportUpdateEnum),
 });

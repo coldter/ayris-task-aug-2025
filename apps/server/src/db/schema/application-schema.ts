@@ -23,6 +23,7 @@ export const testCases = pgTable("test_cases", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .default(sql`generate_entity_id('TC', 5)`),
+  title: text("title").notNull(),
   description: text("description").notNull(),
   testerUpdate: varchar("tester_update", {
     enum: testerUpdateEnum,

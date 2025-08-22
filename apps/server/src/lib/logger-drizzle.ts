@@ -12,15 +12,19 @@ export class DrizzleLogger implements Logger {
     //   },
     // );
 
-    logger.debug(
-      `${chalk.cyanBright("DB Query Escaped:")} ${highlight(
-        this.replaceSqlPlaceholders(query, params),
-        {
-          language: "sql",
-          ignoreIllegals: true,
-        },
-      )}`,
-    );
+    logger
+      .child({
+        label: "drizzle",
+      })
+      .debug(
+        `${chalk.cyanBright("DB Query Escaped:")} ${highlight(
+          this.replaceSqlPlaceholders(query, params),
+          {
+            language: "sql",
+            ignoreIllegals: true,
+          },
+        )}`,
+      );
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: <>

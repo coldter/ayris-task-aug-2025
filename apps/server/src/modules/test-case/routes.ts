@@ -5,25 +5,26 @@ import { checkRole } from "@/middlewares/guard/check-role";
 import {
   createTestCaseRequestSchema,
   createTestCaseResponseSchema,
+  getAllTestCasesForTesterResponseSchema,
   getAllTestCasesGroupedByTestersResponseSchema,
 } from "@/modules/test-case/schema";
 
 const testCaseRoutes = {
-  getAllTestCasesForTester: createRouteConfig({
-    operationId: "getAllTestCasesForTester",
+  getAllTestCasesAssignedToTester: createRouteConfig({
+    operationId: "getAllTestCasesAssignedToTester",
     method: "get",
-    path: "/",
+    path: "/assigned-to-me",
     guard: [isAuthenticated, checkRole({ role: ["tester"] })],
     tags: ["test-case"],
-    summary: "Get all test cases for a tester",
-    description: "Returns all test cases for a tester",
+    summary: "Get all test cases assigned to the tester",
+    description: "Returns all test cases assigned to the tester",
     request: {},
     responses: {
       200: {
         description: "Context entities",
         content: {
           "application/json": {
-            schema: getAllTestCasesGroupedByTestersResponseSchema,
+            schema: getAllTestCasesForTesterResponseSchema,
           },
         },
       },
