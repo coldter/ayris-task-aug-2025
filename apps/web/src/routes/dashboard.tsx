@@ -17,7 +17,7 @@ function RouteComponent() {
         to: "/login",
       });
     }
-  }, [session, isPending]);
+  }, [session, isPending, navigate]);
 
   if (isPending) {
     return <div>Loading...</div>;

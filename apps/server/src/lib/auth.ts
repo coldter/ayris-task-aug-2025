@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin } from "better-auth/plugins";
+import { admin, openAPI } from "better-auth/plugins";
+import { ac, roles } from "@/lib/permission";
 import { db } from "../db";
 import * as schema from "../db/schema/auth";
-import { ac, roles } from "@/lib/permission";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -21,6 +21,15 @@ export const auth = betterAuth({
       sameSite: "none",
       secure: true,
       httpOnly: true,
+    },
+    cookies: {
+      session_token: {
+        name: "session_token_v1",
+        attributes: {
+          httpOnly: true,
+          secure: true,
+        },
+      },
     },
   },
   session: {
@@ -45,6 +54,9 @@ export const auth = betterAuth({
       roles: roles,
       adminRoles: ["superadmin"],
       defaultRole: "tester",
+    }),
+    openAPI({
+      disableDefaultReference: true,
     }),
   ],
 });
