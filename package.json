@@ -1,30 +1,30 @@
 {
-	"name": "ayris-task",
-	"private": true,
-	"workspaces": [
-		"apps/*",
-		"packages/*"
-	],
-	"scripts": {
-		"check": "biome check --write .",
-		"dev": "npm run dev --workspaces",
-		"build": "npm run build --workspaces",
-		"check-types": "npm run check-types --workspaces",
-		"dev:native": "npm run dev --workspace native",
-		"dev:web": "npm run dev --workspace web",
-		"dev:server": "npm run dev --workspace server",
-		"db:push": "npm run db:push --workspace server",
-		"db:studio": "npm run db:studio --workspace server",
-		"db:generate": "npm run db:generate --workspace server",
-		"db:migrate": "npm run db:migrate --workspace server",
-		"db:start": "npm run db:start --workspace server",
-		"db:watch": "npm run db:watch --workspace server",
-		"db:stop": "npm run db:stop --workspace server",
-		"db:down": "npm run db:down --workspace server"
-	},
-	"dependencies": {},
-	"devDependencies": {
-		"@biomejs/biome": "^2.2.0"
-	},
-	"packageManager": "npm@11.3.0"
+  "name": "ayris-task",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "check": "biome check --write .",
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "check-types": "npm run check-types --workspaces",
+    "dev:native": "npm run dev --workspace native",
+    "dev:web": "npm run dev --workspace web",
+    "dev:server": "npm run dev --workspace server",
+    "db:push": "npm run db:push --workspace server",
+    "db:studio": "npm run db:studio --workspace server",
+    "db:generate": "npm run db:generate --workspace server",
+    "db:migrate": "npm run db:migrate --workspace server",
+    "db:start": "npm run db:start --workspace server",
+    "db:watch": "npm run db:watch --workspace server",
+    "db:stop": "npm run db:stop --workspace server",
+    "db:down": "npm run db:down --workspace server"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0"
+  },
+  "packageManager": "npm@11.3.0"
 }
