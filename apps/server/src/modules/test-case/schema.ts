@@ -20,14 +20,17 @@ export const getAllTestCasesGroupedByTestersResponseSchema = z.object({
 });
 
 export const createTestCaseRequestSchema = z.object({
-  testerId: z.string().array().min(1),
+  testerIds: z.string().array().min(1),
   description: z.string(),
 });
 
 export const createTestCaseResponseSchema = z.object({
   id: z.string(),
   description: z.string(),
-  testerId: z.string().array().min(1),
   testerUpdate: z.enum(testerUpdateEnum),
   supportUpdate: z.enum(supportUpdateEnum),
+});
+
+export const getAllTestCasesForTesterResponseSchema = z.object({
+  testCases: z.array(createTestCaseResponseSchema),
 });

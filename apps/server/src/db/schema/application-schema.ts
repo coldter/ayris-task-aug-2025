@@ -46,6 +46,12 @@ export const testCases = pgTable("test_cases", {
     .$onUpdateFn(() => new Date()),
 });
 
+export const testCaseTransitionStatusEnum = [
+  ...testerUpdateEnum,
+  ...supportUpdateEnum,
+  "initiated",
+] as const;
+
 export const testCaseTransitionLogs = pgTable(
   "test_case_transition_logs",
   {
@@ -53,7 +59,7 @@ export const testCaseTransitionLogs = pgTable(
       .notNull()
       .references(() => testCases.id, { onDelete: "cascade" }),
     transitionStatus: varchar("transition_status", {
-      enum: [...testerUpdateEnum, ...supportUpdateEnum],
+      enum: testCaseTransitionStatusEnum,
     }).notNull(),
     transitionAt: timestamp("transition_at")
       .$defaultFn(() => new Date())
