@@ -51,7 +51,7 @@ function RouteComponent() {
           filterField: "role",
           filterValue: "tester",
           filterOperator: "eq",
-          sortBy: "name",
+          sortBy: "createdAt",
           sortDirection: "asc",
         },
       });

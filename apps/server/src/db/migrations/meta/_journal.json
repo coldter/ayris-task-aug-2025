@@ -8,6 +8,27 @@
       "when": 1755860434039,
       "tag": "0000_yummy_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1755886468702,
+      "tag": "0001_custom_entiy_id_generator",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755886770991,
+      "tag": "0002_light_meltdown",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755887590724,
+      "tag": "0003_gorgeous_dark_beast",
+      "breakpoints": true
     }
   ]
 }
