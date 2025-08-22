@@ -1,28 +1,6 @@
 # ayris-task
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, and more.
-
-## Features
-
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Hono** - Lightweight, performant server framework
-- **Node.js** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **PostgreSQL** - Database engine
-- **Authentication** - Email & password authentication with Better Auth
-- **Biome** - Linting and formatting
-
 ## Getting Started
-
-First, install the dependencies:
-
-```bash
-npm install
-```
-## Database Setup
 
 This project uses PostgreSQL with Drizzle ORM.
 
