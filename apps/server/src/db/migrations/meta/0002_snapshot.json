@@ -27,12 +27,8 @@
           "name": "test_case_assignments_test_case_id_test_cases_id_fk",
           "tableFrom": "test_case_assignments",
           "tableTo": "test_cases",
-          "columnsFrom": [
-            "test_case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["test_case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -40,12 +36,8 @@
           "name": "test_case_assignments_tester_id_user_id_fk",
           "tableFrom": "test_case_assignments",
           "tableTo": "user",
-          "columnsFrom": [
-            "tester_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tester_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -53,10 +45,7 @@
       "compositePrimaryKeys": {
         "test_case_assignments_test_case_id_tester_id_pk": {
           "name": "test_case_assignments_test_case_id_tester_id_pk",
-          "columns": [
-            "test_case_id",
-            "tester_id"
-          ]
+          "columns": ["test_case_id", "tester_id"]
         }
       },
       "uniqueConstraints": {},
@@ -120,12 +109,8 @@
           "name": "test_cases_created_by_user_id_fk",
           "tableFrom": "test_cases",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -225,12 +210,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -306,12 +287,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -321,9 +298,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -409,9 +384,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},

@@ -20,7 +20,9 @@ export const supportUpdateEnum = [
 ] as const;
 
 export const testCases = pgTable("test_cases", {
-  id: varchar("id", { length: 255 }).primaryKey().default(sql`generate_entity_id('TC', 5)`),
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .default(sql`generate_entity_id('TC', 5)`),
   description: text("description").notNull(),
   testerUpdate: varchar("tester_update", {
     enum: testerUpdateEnum,

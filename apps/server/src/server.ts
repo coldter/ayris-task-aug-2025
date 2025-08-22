@@ -5,6 +5,7 @@ import { logger as httpLogger } from "hono/logger";
 import type { Env } from "@/lib/context";
 import { handleError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
+import { authContextMiddleware } from "@/middlewares/auth-context";
 
 const baseApp = new OpenAPIHono<Env>();
 
@@ -25,6 +26,8 @@ baseApp.use(
 );
 
 baseApp.get("/ping", (c) => c.text("pong"));
+
+baseApp.use(authContextMiddleware);
 
 baseApp.notFound(() => {
   throw new HTTPException(404, {

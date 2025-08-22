@@ -1,4 +1,7 @@
 import authRouteHandler from "@/modules/auth/handler";
+import testCaseHandler from "@/modules/test-case/handler";
 import baseApp from "@/server";
 
-export const app = baseApp.route("/api/auth", authRouteHandler);
+export const app = baseApp
+  .route("/api/auth", authRouteHandler)
+  .route("/api/test-case", testCaseHandler);
