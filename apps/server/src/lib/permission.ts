@@ -1,6 +1,8 @@
+import { adminAc, defaultStatements } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
 
 const statement = {
+  ...defaultStatements,
   testCase: [
     "read",
     "updateTesterStatus",
@@ -8,7 +10,6 @@ const statement = {
     "create",
     "delete",
   ],
-  user: ["create", "read", "update", "delete"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -22,7 +23,15 @@ export const supportRole = ac.newRole({
 });
 
 export const superadminRole = ac.newRole({
-  user: ["create"],
+  // user: ["create"],
+  testCase: [
+    "read",
+    "updateTesterStatus",
+    "updateSupportStatus",
+    "create",
+    "delete",
+  ],
+  ...adminAc.statements,
 });
 
 export const roles = {

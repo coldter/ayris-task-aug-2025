@@ -9,9 +9,9 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 export default function SignInForm({
-  onSwitchToSignUp,
+  _onSwitchToSignUp,
 }: {
-  onSwitchToSignUp: () => void;
+  _onSwitchToSignUp: () => void;
 }) {
   const navigate = useNavigate({
     from: "/",
@@ -125,7 +125,7 @@ export default function SignInForm({
         </form.Subscribe>
       </form>
 
-      <div className="mt-4 text-center">
+      {/* <div className="mt-4 text-center">
         <Button
           variant="link"
           onClick={onSwitchToSignUp}
@@ -133,7 +133,7 @@ export default function SignInForm({
         >
           Need an account? Sign Up
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }
