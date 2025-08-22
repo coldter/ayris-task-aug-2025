@@ -20,7 +20,7 @@ export const supportUpdateEnum = [
 ] as const;
 
 export const testCases = pgTable("test_cases", {
-  id: text("id").primaryKey().default(sql`generate_entity_id('TC', 5)`),
+  id: varchar("id", { length: 255 }).primaryKey().default(sql`generate_entity_id('TC', 5)`),
   description: text("description").notNull(),
   testerUpdate: varchar("tester_update", {
     enum: testerUpdateEnum,
@@ -47,7 +47,7 @@ export const testCases = pgTable("test_cases", {
 export const testCaseTransitionLogs = pgTable(
   "test_case_transition_logs",
   {
-    testCaseId: text("test_case_id")
+    testCaseId: varchar("test_case_id")
       .notNull()
       .references(() => testCases.id, { onDelete: "cascade" }),
     transitionStatus: varchar("transition_status", {
@@ -69,7 +69,7 @@ export const testCaseTransitionLogs = pgTable(
 export const testCaseAssignments = pgTable(
   "test_case_assignments",
   {
-    testCaseId: text("test_case_id")
+    testCaseId: varchar("test_case_id")
       .notNull()
       .references(() => testCases.id, { onDelete: "cascade" }),
     testerId: text("tester_id")
