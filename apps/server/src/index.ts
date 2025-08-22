@@ -14,7 +14,7 @@ showRoutes(app, {
 serve(
   {
     fetch: app.fetch,
-    port: 3000,
+    port: Number.parseInt(process.env.PORT || "3000", 10),
   },
   (info) => {
     logger.info(`Server is running on http://localhost:${info.port}`);
