@@ -13,9 +13,7 @@ export default function SignInForm({
 }: {
   _onSwitchToSignUp: () => void;
 }) {
-  const navigate = useNavigate({
-    from: "/",
-  });
+  const navigate = useNavigate();
   const { isPending } = authClient.useSession();
 
   const form = useForm({
@@ -33,6 +31,7 @@ export default function SignInForm({
           onSuccess: () => {
             navigate({
               to: "/dashboard",
+              replace: true,
             });
             toast.success("Sign in successful");
           },
@@ -124,16 +123,6 @@ export default function SignInForm({
           )}
         </form.Subscribe>
       </form>
-
-      {/* <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={onSwitchToSignUp}
-          className="text-indigo-600 hover:text-indigo-800"
-        >
-          Need an account? Sign Up
-        </Button>
-      </div> */}
     </div>
   );
 }
