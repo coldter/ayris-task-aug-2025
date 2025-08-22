@@ -49,29 +49,6 @@ function RouteComponent() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30">
-                  ⚡
-                </div>
-                <div>
-                  <p className="font-medium">Quick Actions</p>
-                  <p className="text-muted-foreground text-sm">
-                    Create, edit, and manage tester and support user accounts
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30">
-                  🔐
-                </div>
-                <div>
-                  <p className="font-medium">Full Access</p>
-                  <p className="text-muted-foreground text-sm">
-                    Complete administrative privileges across all system
-                    functions
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
