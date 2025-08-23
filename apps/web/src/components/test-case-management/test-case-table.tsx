@@ -78,9 +78,13 @@ export function TestCaseTable({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="pending_validation">
+                      Pending Validation
+                    </SelectItem>
                     <SelectItem value="passed">Passed</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
+                    <SelectItem value="retest">Retest</SelectItem>
+                    <SelectItem value="na">N/A</SelectItem>
                   </SelectContent>
                 </Select>
               </td>

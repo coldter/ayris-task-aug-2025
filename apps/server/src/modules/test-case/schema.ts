@@ -1,5 +1,10 @@
 import { z } from "@hono/zod-openapi";
-import { supportUpdateEnum, testerUpdateEnum } from "@/db/schema";
+import {
+  supportUpdateEnum,
+  testCaseTransitionStatusEnum,
+  testerUpdateEnum,
+} from "@/db/schema/application-schema";
+import { roleEnum } from "@/db/schema/auth";
 
 export const getAllTestCasesGroupedByTestersResponseSchema = z.object({
   testers: z.array(
@@ -34,4 +39,32 @@ export const createTestCaseResponseSchema = z.object({
 
 export const getAllTestCasesForTesterResponseSchema = z.object({
   testCases: z.array(createTestCaseResponseSchema),
+});
+
+const userSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  role: z.enum(roleEnum),
+});
+
+// Transition timeline entry schema
+const transitionTimelineEntrySchema = z.object({
+  status: z.enum(testCaseTransitionStatusEnum),
+  transitionAt: z.iso.datetime(),
+  transitionBy: userSchema,
+  comment: z.string().optional(),
+});
+
+export const getFullTestCaseDetailsByTestCaseIdResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  testerUpdate: z.enum(testerUpdateEnum),
+  supportUpdate: z.enum(supportUpdateEnum),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  createdBy: userSchema,
+  assignedTesters: z.array(userSchema),
+  transitionTimeline: z.array(transitionTimelineEntrySchema),
 });

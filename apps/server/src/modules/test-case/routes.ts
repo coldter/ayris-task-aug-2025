@@ -1,3 +1,4 @@
+import { z } from "@hono/zod-openapi";
 import { commonErrorResponses } from "@/lib/common-resonse";
 import { createRouteConfig } from "@/lib/route-config";
 import { isAuthenticated } from "@/middlewares/guard";
@@ -7,6 +8,7 @@ import {
   createTestCaseResponseSchema,
   getAllTestCasesForTesterResponseSchema,
   getAllTestCasesGroupedByTestersResponseSchema,
+  getFullTestCaseDetailsByTestCaseIdResponseSchema,
 } from "@/modules/test-case/schema";
 
 const testCaseRoutes = {
@@ -31,6 +33,7 @@ const testCaseRoutes = {
       ...commonErrorResponses,
     },
   }),
+
   getAllTestCasesGroupedByTesters: createRouteConfig({
     operationId: "getAllTestCasesGroupedByTesters",
     method: "get",
@@ -46,6 +49,32 @@ const testCaseRoutes = {
         content: {
           "application/json": {
             schema: getAllTestCasesGroupedByTestersResponseSchema,
+          },
+        },
+      },
+      ...commonErrorResponses,
+    },
+  }),
+
+  getFullTestCaseDetailsByTestCaseId: createRouteConfig({
+    operationId: "getFullTestCaseDetailsByTestCaseId",
+    method: "get",
+    path: "/:testCaseId",
+    guard: [isAuthenticated, checkRole({ role: ["superadmin", "support"] })],
+    tags: ["test-case"],
+    summary: "Get full test case details by test case id",
+    description: "Returns full test case details by test case id",
+    request: {
+      params: z.object({
+        testCaseId: z.string(),
+      }),
+    },
+    responses: {
+      200: {
+        description: "Context entities",
+        content: {
+          "application/json": {
+            schema: getFullTestCaseDetailsByTestCaseIdResponseSchema,
           },
         },
       },

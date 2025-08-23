@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiRpc } from "./api-client";
 
 const BACKEND_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 
@@ -30,5 +31,22 @@ export const useApiStatus = () => {
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+};
+
+export const useTestCasesGroupedByTesters = () => {
+  return useQuery({
+    queryKey: ["test-cases-grouped"],
+    queryFn: async () => {
+      const response = await apiRpc.api["test-case"].$get();
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 };
