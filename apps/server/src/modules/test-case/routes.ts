@@ -95,8 +95,9 @@ const testCaseRoutes = {
       checkRole({ role: ["superadmin", "support", "tester"] }),
     ],
     tags: ["test-case"],
-    summary: "Get full test case details by test case id",
-    description: "Returns full test case details by test case id",
+    summary: "Edit a test case by test case id and action",
+    description:
+      "Edit a test case by test case id and action. Action can be 'edit', 'support-update', 'tester-update'",
     request: {
       params: z.object({
         testCaseId: z.string(),
