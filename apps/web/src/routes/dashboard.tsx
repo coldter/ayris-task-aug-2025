@@ -10,6 +10,8 @@ import {
   useCreateTestCase,
   useTestCaseDetails,
   useTestCasesGroupedByTesters,
+  useUpdateTestCaseDetails,
+  useUpdateTestCaseSupportStatus,
 } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
@@ -41,11 +43,25 @@ function RouteComponent() {
     error: testCasesError,
   } = useTestCasesGroupedByTesters();
 
+  // Set all tester cards to expanded when data is loaded
+  useEffect(() => {
+    if (testCasesData?.testers) {
+      const allTesterIds = new Set(testCasesData.testers.map(tester => tester.id));
+      setExpandedTesters(allTesterIds);
+    }
+  }, [testCasesData]);
+
   // Fetch available testers for test case creation
   const { data: availableTestersData } = useAvailableTesters();
 
   // Create test case mutation
   const createTestCaseMutation = useCreateTestCase();
+
+  // Update test case support status mutation
+  const updateSupportStatusMutation = useUpdateTestCaseSupportStatus();
+
+  // Update test case details mutation
+  const updateTestCaseDetailsMutation = useUpdateTestCaseDetails();
 
   // Fetch test case details when a test case is selected
   const { data: testCaseDetailsData, isLoading: isTestCaseDetailsLoading } =
@@ -71,9 +87,27 @@ function RouteComponent() {
     });
   };
 
-  const handleUpdateSupportStatus = (testCaseId: string, status: string) => {
-    // TODO: Implement API call to update support status
-    console.log("Update support status:", testCaseId, status);
+  const handleUpdateSupportStatus = async (
+    testCaseId: string,
+    status:
+      | "complete"
+      | "passed"
+      | "failed"
+      | "retest"
+      | "na"
+      | "pending_validation",
+  ) => {
+    try {
+      await updateSupportStatusMutation.mutateAsync({
+        testCaseId,
+        supportUpdate: status,
+      });
+
+      toast.success("Support status updated successfully!");
+    } catch (error) {
+      console.error("Failed to update support status:", error);
+      toast.error("Failed to update support status. Please try again.");
+    }
   };
 
   const handleNewTestCase = () => {
@@ -111,6 +145,35 @@ function RouteComponent() {
 
   const handleCloseTestCaseDetails = () => {
     setSelectedTestCaseId(null);
+  };
+
+  const handleUpdateTestCaseDetails = async (updatedTestCase: {
+    title?: string;
+    description?: string;
+    supportUpdate?: string;
+  }) => {
+    if (!selectedTestCaseId) return;
+
+    try {
+      await updateTestCaseDetailsMutation.mutateAsync({
+        testCaseId: selectedTestCaseId,
+        title: updatedTestCase.title || "",
+        description: updatedTestCase.description || "",
+        supportUpdate: updatedTestCase.supportUpdate as
+          | "complete"
+          | "passed"
+          | "failed"
+          | "retest"
+          | "na"
+          | "pending_validation"
+          | undefined,
+      });
+
+      toast.success("Test case updated successfully!");
+    } catch (error) {
+      console.error("Failed to update test case:", error);
+      toast.error("Failed to update test case. Please try again.");
+    }
   };
 
   if (isPending) {
@@ -166,6 +229,8 @@ function RouteComponent() {
           <TestCaseDetails
             testCase={testCaseDetailsData}
             onClose={handleCloseTestCaseDetails}
+            onUpdate={handleUpdateTestCaseDetails}
+            onUpdateSupportStatus={handleUpdateSupportStatus}
           />
         );
       }

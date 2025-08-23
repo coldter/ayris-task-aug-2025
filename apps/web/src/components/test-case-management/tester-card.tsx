@@ -22,7 +22,16 @@ interface TesterCardProps {
   tester: Tester;
   isExpanded?: boolean;
   onToggleExpansion?: (testerId: string) => void;
-  onUpdateSupportStatus?: (testCaseId: string, status: string) => void;
+  onUpdateSupportStatus?: (
+    testCaseId: string,
+    status:
+      | "complete"
+      | "passed"
+      | "failed"
+      | "retest"
+      | "na"
+      | "pending_validation",
+  ) => void;
   onViewTestCase?: (testCaseId: string) => void;
 }
 

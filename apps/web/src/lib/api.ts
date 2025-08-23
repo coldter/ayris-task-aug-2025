@@ -113,3 +113,79 @@ export const useTestCaseDetails = (testCaseId: string) => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useUpdateTestCaseSupportStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      testCaseId: string;
+      supportUpdate:
+        | "complete"
+        | "passed"
+        | "failed"
+        | "retest"
+        | "na"
+        | "pending_validation";
+    }) => {
+      const response = await apiRpc.api["test-case"][":testCaseId"].$patch({
+        param: { testCaseId: data.testCaseId },
+        json: {
+          action: "support-update",
+          supportUpdate: data.supportUpdate,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch test cases data after update
+      queryClient.invalidateQueries({ queryKey: ["test-cases-grouped"] });
+      queryClient.invalidateQueries({ queryKey: ["test-case-details"] });
+    },
+  });
+};
+
+export const useUpdateTestCaseDetails = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      testCaseId: string;
+      title: string;
+      description: string;
+      supportUpdate?:
+        | "complete"
+        | "passed"
+        | "failed"
+        | "retest"
+        | "na"
+        | "pending_validation";
+    }) => {
+      const response = await apiRpc.api["test-case"][":testCaseId"].$patch({
+        param: { testCaseId: data.testCaseId },
+        json: {
+          action: "edit",
+          title: data.title,
+          description: data.description,
+          supportUpdate: data.supportUpdate,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch test cases data after update
+      queryClient.invalidateQueries({ queryKey: ["test-cases-grouped"] });
+      queryClient.invalidateQueries({ queryKey: ["test-case-details"] });
+    },
+  });
+};

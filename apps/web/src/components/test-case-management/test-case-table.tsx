@@ -19,7 +19,16 @@ interface TestCase {
 
 interface TestCaseTableProps {
   testCases: TestCase[];
-  onUpdateSupportStatus?: (testCaseId: string, status: string) => void;
+  onUpdateSupportStatus?: (
+    testCaseId: string,
+    status:
+      | "complete"
+      | "passed"
+      | "failed"
+      | "retest"
+      | "na"
+      | "pending_validation",
+  ) => void;
   onViewTestCase?: (testCaseId: string) => void;
 }
 
@@ -74,16 +83,30 @@ export function TestCaseTable({
                 <Select
                   defaultValue={testCase.supportUpdate}
                   onValueChange={(value) =>
-                    onUpdateSupportStatus?.(testCase.id, value)
+                    onUpdateSupportStatus?.(
+                      testCase.id,
+                      value as
+                        | "complete"
+                        | "passed"
+                        | "failed"
+                        | "retest"
+                        | "na"
+                        | "pending_validation",
+                    )
                   }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="pending_validation">
+                      Pending Validation
+                    </SelectItem>
                     <SelectItem value="passed">Passed</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
+                    <SelectItem value="retest">Retest</SelectItem>
+                    <SelectItem value="complete">Complete</SelectItem>
+                    <SelectItem value="na">N/A</SelectItem>
                   </SelectContent>
                 </Select>
               </td>

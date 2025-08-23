@@ -94,12 +94,14 @@ interface TestCaseDetailsProps {
   testCase: TestCaseDetails;
   onClose?: () => void;
   onUpdate?: (updatedTestCase: Partial<TestCaseDetails>) => void;
+  onUpdateSupportStatus?: (testCaseId: string, status: "complete" | "passed" | "failed" | "retest" | "na" | "pending_validation") => void;
 }
 
 export function TestCaseDetails({
   testCase,
   onClose,
   onUpdate,
+  onUpdateSupportStatus,
 }: TestCaseDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(testCase.title);
@@ -141,11 +143,19 @@ export function TestCaseDetails({
   };
 
   const handleSave = () => {
-    if (onUpdate) {
+    const titleChanged = editedTitle !== testCase.title;
+    const descriptionChanged = editedDescription !== testCase.description;
+    const supportStatusChanged = editedSupportUpdate !== testCase.supportUpdate;
+
+    // If only support status changed, use the dedicated handler
+    if (supportStatusChanged && !titleChanged && !descriptionChanged && onUpdateSupportStatus) {
+      onUpdateSupportStatus(testCase.id, editedSupportUpdate as "complete" | "passed" | "failed" | "retest" | "na" | "pending_validation");
+    } else if (onUpdate) {
+      // Use general update for title/description changes
       onUpdate({
         title: editedTitle,
         description: editedDescription,
-        supportUpdate: editedSupportUpdate,
+        supportUpdate: supportStatusChanged ? editedSupportUpdate : undefined,
       });
     }
     setIsEditing(false);
@@ -202,10 +212,14 @@ export function TestCaseDetails({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="pending_validation">
+                            Pending Validation
+                          </SelectItem>
                           <SelectItem value="passed">Passed</SelectItem>
                           <SelectItem value="failed">Failed</SelectItem>
+                          <SelectItem value="retest">Retest</SelectItem>
                           <SelectItem value="complete">Complete</SelectItem>
+                          <SelectItem value="na">N/A</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -217,7 +231,7 @@ export function TestCaseDetails({
                     <Input
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
-                      className="border-0 bg-transparent p-0 font-bold text-3xl text-slate-900 focus-visible:ring-0"
+                      className="border-0 bg-transparent p-0 font-bold text-3xl text-foreground focus-visible:ring-0"
                       placeholder="Test case title..."
                     />
                   ) : (
@@ -267,7 +281,7 @@ export function TestCaseDetails({
                     content={editedDescription}
                     onChange={handleDescriptionChange}
                     placeholder="Enter detailed test case description..."
-                    className="min-h-[200px] bg-background"
+                    className="min-h-[200px] bg-card"
                   />
                 ) : (
                   <SanitizedContent html={testCase.description} />
