@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import { Skeleton } from "./ui/skeleton";
 
 export default function UserMenu() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
@@ -41,6 +43,7 @@ export default function UserMenu() {
             variant="destructive"
             className="w-full"
             onClick={() => {
+              queryClient.clear();
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {

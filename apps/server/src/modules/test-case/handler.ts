@@ -1,6 +1,6 @@
 import { OpenAPIHono, type z } from "@hono/zod-openapi";
 import { sentenceCase } from "change-case";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { db } from "@/db";
 import {
@@ -66,7 +66,8 @@ const testCaseHandler = app
         eq(testCases.id, testCaseAssignments.testCaseId),
       )
       .innerJoin(user, eq(testCaseAssignments.testerId, reqUser.id))
-      .where(eq(user.id, reqUser.id));
+      .where(eq(user.id, reqUser.id))
+      .orderBy(desc(testCases.createdAt));
 
     return c.json(
       {

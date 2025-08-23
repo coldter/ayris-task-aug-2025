@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -10,8 +11,10 @@ import {
   useCreateTestCase,
   useTestCaseDetails,
   useTestCasesGroupedByTesters,
+  useTesterTestCases,
   useUpdateTestCaseDetails,
   useUpdateTestCaseSupportStatus,
+  useUpdateTestCaseTesterStatus,
 } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
@@ -22,6 +25,7 @@ export const Route = createFileRoute("/dashboard")({
 function RouteComponent() {
   const { data: session, isPending } = authClient.useSession();
   const navigate = Route.useNavigate();
+  const queryClient = useQueryClient();
 
   // State for managing expanded tester cards
   const [expandedTesters, setExpandedTesters] = useState<Set<string>>(
@@ -36,36 +40,62 @@ function RouteComponent() {
     null,
   );
 
+  // Conditionally fetch data based on user role
+  const isSupporter =
+    session?.user.role === "support" || session?.user.role === "superadmin";
+  const isTester = session?.user.role === "tester";
+
   // Fetch test cases for supporters
   const {
     data: testCasesData,
     isLoading: isTestCasesLoading,
     error: testCasesError,
-  } = useTestCasesGroupedByTesters();
+  } = useTestCasesGroupedByTesters({
+    enabled: isSupporter,
+  });
 
   // Set all tester cards to expanded when data is loaded
   useEffect(() => {
     if (testCasesData?.testers) {
-      const allTesterIds = new Set(testCasesData.testers.map(tester => tester.id));
+      const allTesterIds = new Set(
+        testCasesData.testers.map((tester) => tester.id),
+      );
       setExpandedTesters(allTesterIds);
     }
   }, [testCasesData]);
 
-  // Fetch available testers for test case creation
-  const { data: availableTestersData } = useAvailableTesters();
+  // Fetch available testers for test case creation (only for supporters)
+  const { data: availableTestersData } = useAvailableTesters({
+    enabled: isSupporter,
+  });
 
-  // Create test case mutation
+  // Create test case mutation (only for supporters)
   const createTestCaseMutation = useCreateTestCase();
 
-  // Update test case support status mutation
+  // Update test case support status mutation (only for supporters)
   const updateSupportStatusMutation = useUpdateTestCaseSupportStatus();
 
-  // Update test case details mutation
+  // Update test case details mutation (only for supporters)
   const updateTestCaseDetailsMutation = useUpdateTestCaseDetails();
+
+  // Update test case tester status mutation
+  const updateTesterStatusMutation = useUpdateTestCaseTesterStatus();
 
   // Fetch test case details when a test case is selected
   const { data: testCaseDetailsData, isLoading: isTestCaseDetailsLoading } =
     useTestCaseDetails(selectedTestCaseId || "");
+
+  // Fetch test cases for testers
+  const {
+    data: testerTestCasesData,
+    isLoading: isTesterTestCasesLoading,
+    error: testerTestCasesError,
+  } = useTesterTestCases({
+    enabled: isTester,
+  });
+
+  // Store the current user ID to detect user changes
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session && !isPending) {
@@ -74,6 +104,27 @@ function RouteComponent() {
       });
     }
   }, [session, isPending, navigate]);
+
+  // Clear cache when user changes
+  useEffect(() => {
+    if (session?.user?.id) {
+      if (currentUserId && currentUserId !== session.user.id) {
+        // User has changed, clear all cached data
+        queryClient.clear();
+        setSelectedTestCaseId(null);
+        setShowCreateTestCase(false);
+        setExpandedTesters(new Set());
+      }
+      setCurrentUserId(session.user.id);
+    } else if (!session && currentUserId) {
+      // User signed out, clear cache
+      queryClient.clear();
+      setCurrentUserId(null);
+      setSelectedTestCaseId(null);
+      setShowCreateTestCase(false);
+      setExpandedTesters(new Set());
+    }
+  }, [session?.user?.id, currentUserId, queryClient, session]);
 
   const handleToggleExpansion = (testerId: string) => {
     setExpandedTesters((prev) => {
@@ -176,6 +227,23 @@ function RouteComponent() {
     }
   };
 
+  const handleUpdateTesterStatus = async (
+    testCaseId: string,
+    status: "pending" | "complete",
+  ) => {
+    try {
+      await updateTesterStatusMutation.mutateAsync({
+        testCaseId,
+        testerUpdate: status,
+      });
+
+      toast.success("Tester status updated successfully!");
+    } catch (error) {
+      console.error("Failed to update tester status:", error);
+      toast.error("Failed to update tester status. Please try again.");
+    }
+  };
+
   if (isPending) {
     return <div>Loading...</div>;
   }
@@ -229,8 +297,17 @@ function RouteComponent() {
           <TestCaseDetails
             testCase={testCaseDetailsData}
             onClose={handleCloseTestCaseDetails}
-            onUpdate={handleUpdateTestCaseDetails}
-            onUpdateSupportStatus={handleUpdateSupportStatus}
+            onUpdate={
+              session?.user.role === "support"
+                ? handleUpdateTestCaseDetails
+                : undefined
+            }
+            onUpdateSupportStatus={
+              session?.user.role === "support"
+                ? handleUpdateSupportStatus
+                : undefined
+            }
+            onUpdateTesterStatus={handleUpdateTesterStatus}
           />
         );
       }
@@ -293,6 +370,149 @@ function RouteComponent() {
                   onViewTestCase={handleViewTestCase}
                 />
               ))}
+            </div>
+          )}
+      </div>
+    );
+  }
+
+  if (session?.user.role === "tester") {
+    // Show test case details if a test case is selected
+    if (selectedTestCaseId) {
+      if (isTestCaseDetailsLoading) {
+        return (
+          <div className="flex min-h-screen items-center justify-center">
+            <div>Loading test case details...</div>
+          </div>
+        );
+      }
+
+      if (testCaseDetailsData) {
+        return (
+          <TestCaseDetails
+            testCase={testCaseDetailsData}
+            onClose={handleCloseTestCaseDetails}
+            onUpdateTesterStatus={handleUpdateTesterStatus}
+          />
+        );
+      }
+    }
+
+    return (
+      <div className="container mx-auto max-w-7xl px-4 py-6">
+        <div className="mb-6">
+          <h1 className="mb-2 font-bold text-2xl">My Test Cases</h1>
+          <p className="text-muted-foreground">
+            View and update status of test cases assigned to you
+          </p>
+        </div>
+
+        {isTesterTestCasesLoading && (
+          <div className="flex justify-center py-8">
+            <div>Loading test cases...</div>
+          </div>
+        )}
+
+        {testerTestCasesError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+            <h3 className="font-semibold">Error loading test cases</h3>
+            <p className="text-sm">{testerTestCasesError.message}</p>
+          </div>
+        )}
+
+        {!isTesterTestCasesLoading &&
+          !testerTestCasesError &&
+          (!testerTestCasesData?.testCases ||
+            testerTestCasesData.testCases.length === 0) && (
+            <div className="rounded-lg border border-border bg-muted p-8 text-center">
+              <h3 className="mb-2 font-semibold text-foreground">
+                No test cases assigned
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                You currently have no test cases assigned to you.
+              </p>
+            </div>
+          )}
+
+        {!isTesterTestCasesLoading &&
+          !testerTestCasesError &&
+          testerTestCasesData?.testCases &&
+          testerTestCasesData.testCases.length > 0 && (
+            <div className="rounded-lg border border-border bg-card shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="border-border border-b bg-muted/50">
+                    <tr>
+                      <th className="w-32 px-6 py-4 text-left font-semibold text-foreground text-sm">
+                        Test ID
+                      </th>
+                      <th className="px-6 py-4 text-left font-semibold text-foreground text-sm">
+                        Title
+                      </th>
+                      <th className="w-40 px-6 py-4 text-left font-semibold text-foreground text-sm">
+                        Status
+                      </th>
+                      <th className="w-40 px-6 py-4 text-left font-semibold text-foreground text-sm">
+                        Support Status
+                      </th>
+                      <th className="w-32 px-6 py-4 text-left font-semibold text-foreground text-sm">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {testerTestCasesData.testCases.map((testCase) => (
+                      <tr key={testCase.id} className="hover:bg-accent">
+                        <td className="px-6 py-4">
+                          <button
+                            type="button"
+                            onClick={() => handleViewTestCase(testCase.id)}
+                            className="font-mono font-semibold text-primary text-sm hover:text-primary/80 hover:underline"
+                          >
+                            {testCase.id}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-foreground text-sm">
+                            {testCase.title}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <select
+                            value={testCase.testerUpdate}
+                            onChange={(e) =>
+                              handleUpdateTesterStatus(
+                                testCase.id,
+                                e.target.value as "pending" | "complete",
+                              )
+                            }
+                            className="rounded border border-border bg-background px-3 py-1 text-sm focus:border-primary focus:outline-none"
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="complete">Complete</option>
+                          </select>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="rounded-full bg-muted px-2 py-1 text-center text-muted-foreground text-xs">
+                            {testCase.supportUpdate
+                              .replace("_", " ")
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            type="button"
+                            onClick={() => handleViewTestCase(testCase.id)}
+                            className="text-primary text-sm hover:text-primary/80 hover:underline"
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
       </div>

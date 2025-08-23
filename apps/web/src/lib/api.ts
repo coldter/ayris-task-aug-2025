@@ -34,7 +34,9 @@ export const useApiStatus = () => {
   });
 };
 
-export const useTestCasesGroupedByTesters = () => {
+export const useTestCasesGroupedByTesters = (
+  options: { enabled?: boolean } = {},
+) => {
   return useQuery({
     queryKey: ["test-cases-grouped"],
     queryFn: async () => {
@@ -48,10 +50,11 @@ export const useTestCasesGroupedByTesters = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+    enabled: options.enabled ?? true,
   });
 };
 
-export const useAvailableTesters = () => {
+export const useAvailableTesters = (options: { enabled?: boolean } = {}) => {
   return useQuery({
     queryKey: ["available-testers"],
     queryFn: async () => {
@@ -65,6 +68,7 @@ export const useAvailableTesters = () => {
     },
     staleTime: 10 * 60 * 1000, // 10 minutes - testers don't change frequently
     refetchOnWindowFocus: false,
+    enabled: options.enabled ?? true,
   });
 };
 
@@ -94,7 +98,10 @@ export const useCreateTestCase = () => {
   });
 };
 
-export const useTestCaseDetails = (testCaseId: string) => {
+export const useTestCaseDetails = (
+  testCaseId: string,
+  options: { enabled?: boolean } = {},
+) => {
   return useQuery({
     queryKey: ["test-case-details", testCaseId],
     queryFn: async () => {
@@ -108,7 +115,7 @@ export const useTestCaseDetails = (testCaseId: string) => {
 
       return response.json();
     },
-    enabled: !!testCaseId,
+    enabled: (options.enabled ?? true) && !!testCaseId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
@@ -187,5 +194,54 @@ export const useUpdateTestCaseDetails = () => {
       queryClient.invalidateQueries({ queryKey: ["test-cases-grouped"] });
       queryClient.invalidateQueries({ queryKey: ["test-case-details"] });
     },
+  });
+};
+
+export const useUpdateTestCaseTesterStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      testCaseId: string;
+      testerUpdate: "pending" | "complete";
+    }) => {
+      const response = await apiRpc.api["test-case"][":testCaseId"].$patch({
+        param: { testCaseId: data.testCaseId },
+        json: {
+          action: "tester-update",
+          testerUpdate: data.testerUpdate,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch test cases data after update
+      queryClient.invalidateQueries({ queryKey: ["test-cases-grouped"] });
+      queryClient.invalidateQueries({ queryKey: ["test-case-details"] });
+      queryClient.invalidateQueries({ queryKey: ["tester-test-cases"] });
+    },
+  });
+};
+
+export const useTesterTestCases = (options: { enabled?: boolean } = {}) => {
+  return useQuery({
+    queryKey: ["tester-test-cases"],
+    queryFn: async () => {
+      const response = await apiRpc.api["test-case"]["assigned-to-me"].$get();
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    enabled: options.enabled ?? true,
   });
 };

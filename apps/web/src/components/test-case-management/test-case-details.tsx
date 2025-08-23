@@ -94,7 +94,20 @@ interface TestCaseDetailsProps {
   testCase: TestCaseDetails;
   onClose?: () => void;
   onUpdate?: (updatedTestCase: Partial<TestCaseDetails>) => void;
-  onUpdateSupportStatus?: (testCaseId: string, status: "complete" | "passed" | "failed" | "retest" | "na" | "pending_validation") => void;
+  onUpdateSupportStatus?: (
+    testCaseId: string,
+    status:
+      | "complete"
+      | "passed"
+      | "failed"
+      | "retest"
+      | "na"
+      | "pending_validation",
+  ) => void;
+  onUpdateTesterStatus?: (
+    testCaseId: string,
+    status: "pending" | "complete",
+  ) => void;
 }
 
 export function TestCaseDetails({
@@ -102,6 +115,7 @@ export function TestCaseDetails({
   onClose,
   onUpdate,
   onUpdateSupportStatus,
+  onUpdateTesterStatus,
 }: TestCaseDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(testCase.title);
@@ -113,6 +127,9 @@ export function TestCaseDetails({
   );
   const [editedSupportUpdate, setEditedSupportUpdate] = useState(
     testCase.supportUpdate,
+  );
+  const [editedTesterUpdate, setEditedTesterUpdate] = useState(
+    testCase.testerUpdate,
   );
 
   const formatDate = (dateString: string) => {
@@ -146,10 +163,39 @@ export function TestCaseDetails({
     const titleChanged = editedTitle !== testCase.title;
     const descriptionChanged = editedDescription !== testCase.description;
     const supportStatusChanged = editedSupportUpdate !== testCase.supportUpdate;
+    const testerStatusChanged = editedTesterUpdate !== testCase.testerUpdate;
 
+    // If only tester status changed, use the dedicated handler
+    if (
+      testerStatusChanged &&
+      !titleChanged &&
+      !descriptionChanged &&
+      !supportStatusChanged &&
+      onUpdateTesterStatus
+    ) {
+      onUpdateTesterStatus(
+        testCase.id,
+        editedTesterUpdate as "pending" | "complete",
+      );
+    }
     // If only support status changed, use the dedicated handler
-    if (supportStatusChanged && !titleChanged && !descriptionChanged && onUpdateSupportStatus) {
-      onUpdateSupportStatus(testCase.id, editedSupportUpdate as "complete" | "passed" | "failed" | "retest" | "na" | "pending_validation");
+    else if (
+      supportStatusChanged &&
+      !titleChanged &&
+      !descriptionChanged &&
+      !testerStatusChanged &&
+      onUpdateSupportStatus
+    ) {
+      onUpdateSupportStatus(
+        testCase.id,
+        editedSupportUpdate as
+          | "complete"
+          | "passed"
+          | "failed"
+          | "retest"
+          | "na"
+          | "pending_validation",
+      );
     } else if (onUpdate) {
       // Use general update for title/description changes
       onUpdate({
@@ -165,6 +211,7 @@ export function TestCaseDetails({
     setEditedTitle(testCase.title);
     setEditedDescription(testCase.description);
     setEditedSupportUpdate(testCase.supportUpdate);
+    setEditedTesterUpdate(testCase.testerUpdate);
     setIsEditing(false);
   };
 
@@ -202,8 +249,24 @@ export function TestCaseDetails({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
-                    <StatusBadge status={testCase.testerUpdate} />
-                    {isEditing ? (
+                    {isEditing && onUpdateTesterStatus ? (
+                      <Select
+                        value={editedTesterUpdate}
+                        onValueChange={setEditedTesterUpdate}
+                      >
+                        <SelectTrigger className="w-40 border-border focus:border-primary">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="complete">Complete</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <StatusBadge status={testCase.testerUpdate} />
+                    )}
+
+                    {isEditing && onUpdateSupportStatus ? (
                       <Select
                         value={editedSupportUpdate}
                         onValueChange={setEditedSupportUpdate}
@@ -227,7 +290,7 @@ export function TestCaseDetails({
                     )}
                   </div>
 
-                  {isEditing ? (
+                  {isEditing && onUpdate ? (
                     <Input
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
@@ -261,14 +324,22 @@ export function TestCaseDetails({
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      variant="outline"
-                      className="gap-2 border-border shadow-sm hover:bg-accent"
-                    >
-                      <EditIcon className="h-4 w-4" />
-                      Edit Details
-                    </Button>
+                    (onUpdate ||
+                      onUpdateSupportStatus ||
+                      onUpdateTesterStatus) && (
+                      <Button
+                        onClick={() => setIsEditing(true)}
+                        variant="outline"
+                        className="gap-2 border-border shadow-sm hover:bg-accent"
+                      >
+                        <EditIcon className="h-4 w-4" />
+                        {onUpdate
+                          ? "Edit Details"
+                          : onUpdateTesterStatus
+                            ? "Update Status"
+                            : "Update Support Status"}
+                      </Button>
+                    )
                   )}
                 </div>
               </div>
@@ -276,7 +347,7 @@ export function TestCaseDetails({
 
             <CardContent className="pt-0">
               <div className="rounded-lg border border-border bg-muted/50 p-6">
-                {isEditing ? (
+                {isEditing && onUpdate ? (
                   <WysiwygEditor
                     content={editedDescription}
                     onChange={handleDescriptionChange}
