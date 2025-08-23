@@ -1,3 +1,4 @@
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import {
   drizzle as drizzleNodePg,
   type NodePgClient,
@@ -5,7 +6,6 @@ import {
 import { logger } from "@/lib/logger";
 import { DrizzleLogger } from "@/lib/logger-drizzle";
 import * as schema from "./schema";
-import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 
 export const db =
   process.env.DATABASE_CONNECTOR !== "neon"
