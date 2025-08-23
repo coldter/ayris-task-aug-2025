@@ -41,10 +41,10 @@ const ToolbarButton = ({
       {children}
     </Button>
     {/* Custom tooltip */}
-    <div className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-[999] mb-2 transform whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-white text-xs opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+    <div className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-[999] mb-2 transform whitespace-nowrap rounded border border-border bg-popover px-2 py-1 text-popover-foreground text-xs opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
       {title}
       {/* Arrow */}
-      <div className="-translate-x-1/2 absolute top-full left-1/2 transform border-4 border-transparent border-t-gray-900" />
+      <div className="-translate-x-1/2 absolute top-full left-1/2 transform border-4 border-transparent border-t-popover" />
     </div>
   </div>
 );

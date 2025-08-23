@@ -2,11 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CreateTestCase } from "@/components/test-case-management/create-test-case";
+import { TestCaseDetails } from "@/components/test-case-management/test-case-details";
 import { TestCaseHeader } from "@/components/test-case-management/test-case-header";
 import { TesterCard } from "@/components/test-case-management/tester-card";
 import {
   useAvailableTesters,
   useCreateTestCase,
+  useTestCaseDetails,
   useTestCasesGroupedByTesters,
 } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
@@ -27,6 +29,11 @@ function RouteComponent() {
   // State for create test case modal
   const [showCreateTestCase, setShowCreateTestCase] = useState(false);
 
+  // State for selected test case view
+  const [selectedTestCaseId, setSelectedTestCaseId] = useState<string | null>(
+    null,
+  );
+
   // Fetch test cases for supporters
   const {
     data: testCasesData,
@@ -39,6 +46,10 @@ function RouteComponent() {
 
   // Create test case mutation
   const createTestCaseMutation = useCreateTestCase();
+
+  // Fetch test case details when a test case is selected
+  const { data: testCaseDetailsData, isLoading: isTestCaseDetailsLoading } =
+    useTestCaseDetails(selectedTestCaseId || "");
 
   useEffect(() => {
     if (!session && !isPending) {
@@ -94,6 +105,14 @@ function RouteComponent() {
     setShowCreateTestCase(false);
   };
 
+  const handleViewTestCase = (testCaseId: string) => {
+    setSelectedTestCaseId(testCaseId);
+  };
+
+  const handleCloseTestCaseDetails = () => {
+    setSelectedTestCaseId(null);
+  };
+
   if (isPending) {
     return <div>Loading...</div>;
   }
@@ -132,6 +151,26 @@ function RouteComponent() {
   }
 
   if (session?.user.role === "support") {
+    // Show test case details if a test case is selected
+    if (selectedTestCaseId) {
+      if (isTestCaseDetailsLoading) {
+        return (
+          <div className="flex min-h-screen items-center justify-center">
+            <div>Loading test case details...</div>
+          </div>
+        );
+      }
+
+      if (testCaseDetailsData) {
+        return (
+          <TestCaseDetails
+            testCase={testCaseDetailsData}
+            onClose={handleCloseTestCaseDetails}
+          />
+        );
+      }
+    }
+
     // Show create test case form if in create mode
     if (showCreateTestCase) {
       return (
@@ -186,6 +225,7 @@ function RouteComponent() {
                   isExpanded={expandedTesters.has(tester.id)}
                   onToggleExpansion={handleToggleExpansion}
                   onUpdateSupportStatus={handleUpdateSupportStatus}
+                  onViewTestCase={handleViewTestCase}
                 />
               ))}
             </div>

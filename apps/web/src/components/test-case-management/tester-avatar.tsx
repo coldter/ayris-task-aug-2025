@@ -25,7 +25,7 @@ export function TesterAvatar({
 
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
-      <AvatarFallback className="bg-blue-100 font-semibold text-blue-600">
+      <AvatarFallback className="bg-blue-100 font-semibold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
         {initials}
       </AvatarFallback>
     </Avatar>

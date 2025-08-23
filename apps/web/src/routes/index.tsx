@@ -47,7 +47,7 @@ function HomeComponent() {
             <Badge variant={getStatusVariant()}>{getStatusText()}</Badge>
           </div>
           {!isLoading && !isError && apiStatus && (
-            <div className="grid gap-2 rounded-lg bg-gray-50 p-3 text-sm">
+            <div className="grid gap-2 rounded-lg bg-muted/50 p-3 text-sm">
               <div className="flex justify-between">
                 <span className="font-medium">Backend URL:</span>
                 <span className="font-mono">

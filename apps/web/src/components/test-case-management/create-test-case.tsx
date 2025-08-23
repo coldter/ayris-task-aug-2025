@@ -123,9 +123,9 @@ export function CreateTestCase({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/50">
       <div className="mx-auto max-w-5xl space-y-8 p-6">
-        <Card className="overflow-visible border-0 bg-white/80 shadow-lg backdrop-blur-sm">
+        <Card className="overflow-visible border-0 bg-card/80 shadow-lg backdrop-blur-sm">
           <CardHeader className="pb-6">
             <div className="flex items-start justify-between">
               <div className="flex-1 space-y-4">
@@ -134,13 +134,13 @@ export function CreateTestCase({
                     onClick={onCancel}
                     variant="ghost"
                     size="sm"
-                    className="gap-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    className="gap-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   >
                     <ArrowLeftIcon className="h-4 w-4" />
                     Back
                   </Button>
                 </div>
-                <h1 className="font-bold text-3xl text-slate-900 leading-tight">
+                <h1 className="font-bold text-3xl text-foreground leading-tight">
                   Create New Test Case
                 </h1>
               </div>
@@ -152,7 +152,7 @@ export function CreateTestCase({
               <div className="space-y-3">
                 <Label
                   htmlFor={titleId}
-                  className="font-medium text-slate-700 text-sm"
+                  className="font-medium text-foreground text-sm"
                 >
                   Test Case Title *
                 </Label>
@@ -165,18 +165,20 @@ export function CreateTestCase({
                   }}
                   placeholder="Enter test case title..."
                   className={cn(
-                    "border-slate-300 transition-all duration-200 focus:border-blue-500",
-                    errors.title ? "border-red-500 focus:border-red-500" : "",
+                    "border-border transition-all duration-200 focus:border-primary",
+                    errors.title
+                      ? "border-destructive focus:border-destructive"
+                      : "",
                   )}
                 />
                 {errors.title && (
-                  <p className="text-red-600 text-sm">{errors.title}</p>
+                  <p className="text-destructive text-sm">{errors.title}</p>
                 )}
               </div>
 
               {/* Tester Selection */}
               <div className="space-y-4">
-                <Label className="font-medium text-slate-700 text-sm">
+                <Label className="font-medium text-foreground text-sm">
                   Assign Testers * (Minimum 1 required)
                 </Label>
 
@@ -187,14 +189,14 @@ export function CreateTestCase({
                       role="combobox"
                       aria-expanded={open}
                       className={cn(
-                        "w-full justify-between border-slate-300 shadow-sm transition-all duration-200 hover:bg-slate-50",
+                        "w-full justify-between border-border shadow-sm transition-all duration-200 hover:bg-accent",
                         errors.testerIds
-                          ? "border-red-500"
-                          : "hover:border-blue-500",
+                          ? "border-destructive"
+                          : "hover:border-primary",
                       )}
                     >
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-slate-500" />
+                        <User className="h-4 w-4 text-muted-foreground" />
                         {selectedTesterIds.length === 0
                           ? "Select testers..."
                           : `${selectedTesterIds.length} tester${selectedTesterIds.length > 1 ? "s" : ""} selected`}
@@ -228,10 +230,10 @@ export function CreateTestCase({
                                   {tester.name.charAt(0)}
                                 </div>
                                 <div className="flex flex-col">
-                                  <span className="font-medium text-slate-900">
+                                  <span className="font-medium text-foreground">
                                     {tester.name}
                                   </span>
-                                  <span className="flex items-center gap-1 text-slate-600 text-sm">
+                                  <span className="flex items-center gap-1 text-muted-foreground text-sm">
                                     <Mail className="h-3 w-3" />
                                     {tester.email}
                                   </span>
@@ -247,13 +249,13 @@ export function CreateTestCase({
 
                 {/* Selected Testers Display */}
                 {selectedTesterIds.length > 0 && (
-                  <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-4">
+                  <div className="rounded-lg border border-border bg-muted/50 p-4">
                     <div className="flex flex-wrap gap-2">
                       {getSelectedTesters().map((tester) => (
                         <Badge
                           key={tester.id}
                           variant="secondary"
-                          className="flex items-center gap-2 bg-slate-200 px-3 py-1 text-slate-700 hover:bg-slate-300"
+                          className="flex items-center gap-2 bg-secondary px-3 py-1 text-secondary-foreground hover:bg-secondary/80"
                         >
                           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 font-medium text-white text-xs">
                             {tester.name.charAt(0)}
@@ -262,7 +264,7 @@ export function CreateTestCase({
                           <button
                             type="button"
                             onClick={() => removeTester(tester.id)}
-                            className="ml-1 rounded-full p-0.5 transition-colors hover:bg-slate-400"
+                            className="ml-1 rounded-full p-0.5 transition-colors hover:bg-secondary"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -273,7 +275,7 @@ export function CreateTestCase({
                 )}
 
                 {errors.testerIds && (
-                  <p className="text-red-600 text-sm">{errors.testerIds}</p>
+                  <p className="text-destructive text-sm">{errors.testerIds}</p>
                 )}
               </div>
 
@@ -281,11 +283,11 @@ export function CreateTestCase({
               <div className="space-y-3">
                 <Label
                   htmlFor="description"
-                  className="font-medium text-slate-700 text-sm"
+                  className="font-medium text-foreground text-sm"
                 >
                   Test Case Description *
                 </Label>
-                <div className="overflow-visible rounded-lg border border-slate-200 bg-slate-50/50 p-6">
+                <div className="overflow-visible rounded-lg border border-border bg-muted/50 p-6">
                   <WysiwygEditor
                     content={description}
                     onChange={(html, json) => {
@@ -295,37 +297,39 @@ export function CreateTestCase({
                     }}
                     placeholder="Enter detailed test case description..."
                     className={cn(
-                      "min-h-[200px] bg-white transition-all duration-200",
+                      "min-h-[200px] bg-background transition-all duration-200",
                       errors.description
-                        ? "border-red-500"
-                        : "focus-within:border-blue-500",
+                        ? "border-destructive"
+                        : "focus-within:border-primary",
                     )}
                   />
                 </div>
                 {errors.description && (
-                  <p className="text-red-600 text-sm">{errors.description}</p>
+                  <p className="text-destructive text-sm">
+                    {errors.description}
+                  </p>
                 )}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-end gap-3 border-slate-200 border-t pt-6">
+              <div className="flex justify-end gap-3 border-border border-t pt-6">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onCancel}
                   disabled={isLoading}
-                  className="border-slate-300 bg-transparent px-6 shadow-sm hover:bg-slate-50"
+                  className="border-border bg-transparent px-6 shadow-sm hover:bg-accent"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-blue-600 px-6 shadow-md hover:bg-blue-700"
+                  className="bg-primary px-6 shadow-md hover:bg-primary/90"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                       Creating...
                     </div>
                   ) : (

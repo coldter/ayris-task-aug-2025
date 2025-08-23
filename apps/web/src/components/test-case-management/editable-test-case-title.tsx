@@ -42,7 +42,7 @@ export function EditableTestCaseTitle({
           size="sm"
           variant="ghost"
           onClick={handleSave}
-          className="text-green-600 hover:bg-green-50"
+          className="text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
         >
           <Save className="h-4 w-4" />
         </Button>
@@ -50,7 +50,7 @@ export function EditableTestCaseTitle({
           size="sm"
           variant="ghost"
           onClick={handleCancel}
-          className="text-red-600 hover:bg-red-50"
+          className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -60,12 +60,12 @@ export function EditableTestCaseTitle({
 
   return (
     <div className="group flex items-start justify-between">
-      <span className="text-gray-900 text-sm leading-relaxed">{title}</span>
+      <span className="text-foreground text-sm leading-relaxed">{title}</span>
       <Button
         size="sm"
         variant="ghost"
         onClick={() => setIsEditing(true)}
-        className="p-1 text-gray-400 opacity-0 transition-opacity hover:text-gray-600 group-hover:opacity-100"
+        className="p-1 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
       >
         <Edit2 className="h-4 w-4" />
       </Button>

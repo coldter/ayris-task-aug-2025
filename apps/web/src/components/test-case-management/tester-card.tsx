@@ -34,24 +34,24 @@ export function TesterCard({
   onViewTestCase,
 }: TesterCardProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-lg border border-border bg-card shadow-sm">
       <button
         type="button"
-        className="flex w-full cursor-pointer items-center justify-between border-gray-200 border-b p-4 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+        className="flex w-full cursor-pointer items-center justify-between border-border border-b p-4 text-left hover:bg-accent focus:bg-accent focus:outline-none"
         onClick={() => onToggleExpansion?.(tester.id)}
       >
         <div className="flex items-center gap-3">
           <ChevronRight
             className={cn(
-              "h-5 w-5 text-gray-400 transition-transform",
+              "h-5 w-5 text-muted-foreground transition-transform",
               isExpanded && "rotate-90",
             )}
           />
           <div className="flex items-center gap-3">
             <TesterAvatar name={tester.name} />
             <div>
-              <h3 className="font-semibold text-gray-900">{tester.name}</h3>
-              <p className="text-gray-500 text-sm">{tester.email}</p>
+              <h3 className="font-semibold text-foreground">{tester.name}</h3>
+              <p className="text-muted-foreground text-sm">{tester.email}</p>
             </div>
           </div>
         </div>

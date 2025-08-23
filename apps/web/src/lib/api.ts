@@ -93,3 +93,23 @@ export const useCreateTestCase = () => {
     },
   });
 };
+
+export const useTestCaseDetails = (testCaseId: string) => {
+  return useQuery({
+    queryKey: ["test-case-details", testCaseId],
+    queryFn: async () => {
+      const response = await apiRpc.api["test-case"][":testCaseId"].$get({
+        param: { testCaseId },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    enabled: !!testCaseId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+};
