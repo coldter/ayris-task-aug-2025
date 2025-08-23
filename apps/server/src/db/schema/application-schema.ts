@@ -51,6 +51,7 @@ export const testCaseTransitionStatusEnum = [
   ...testerUpdateEnum,
   ...supportUpdateEnum,
   "initiated",
+  "edited",
 ] as const;
 
 export const testCaseTransitionLogs = pgTable(

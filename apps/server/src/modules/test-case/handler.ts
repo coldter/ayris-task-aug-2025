@@ -11,10 +11,8 @@ import {
 } from "@/db/schema";
 import type { Env } from "@/lib/context";
 import testCaseRoutes from "@/modules/test-case/routes";
-import type {
-  getAllTestCasesGroupedByTestersResponseSchema,
-  getFullTestCaseDetailsByTestCaseIdResponseSchema,
-} from "@/modules/test-case/schema";
+import type { getAllTestCasesGroupedByTestersResponseSchema } from "@/modules/test-case/schema";
+import { getTestCaseFullDetail } from "@/modules/test-case/servies";
 
 const app = new OpenAPIHono<Env>();
 
@@ -139,68 +137,123 @@ const testCaseHandler = app
         );
       }
     }
-    type TestCaseDetails = z.infer<
-      typeof getFullTestCaseDetailsByTestCaseIdResponseSchema
-    >;
 
-    const [result] = await db
-      .select({
-        result: sql<TestCaseDetails>`
-        json_build_object(
-          'id', ${testCases.id},
-          'title', ${testCases.title},
-          'description', ${testCases.description},
-          'testerUpdate', ${testCases.testerUpdate},
-          'supportUpdate', ${testCases.supportUpdate},
-          'createdAt', ${testCases.createdAt},
-          'updatedAt', ${testCases.updatedAt},
-          'createdBy', json_build_object(
-            'id', ${user.id},
-            'name', ${user.name},
-            'email', ${user.email},
-            'role', ${user.role}
-          ),
-          'assignedTesters', COALESCE(
-            (SELECT json_agg(
-              json_build_object(
-                'id', u.id,
-                'name', u.name,
-                'email', u.email,
-                'role', u.role
-              )
-            )
-            FROM test_case_assignments tca
-            JOIN "user" u ON tca.tester_id = u.id
-            WHERE tca.test_case_id = ${testCases.id}
-            AND u.role = 'tester'),
-            '[]'::json
-          ),
-          'transitionTimeline', COALESCE(
-            (SELECT json_agg(
-              json_build_object(
-                'status', ttl.transition_status,
-                'transitionAt', ttl.transition_at,
-                'transitionBy', json_build_object(
-                  'id', transition_user.id,
-                  'name', transition_user.name,
-                  'email', transition_user.email,
-                  'role', transition_user.role
-                ),
-                'comment', ttl.transition_comment
-              )
-              ORDER BY ttl.transition_at ASC
-            )
-            FROM test_case_transition_logs ttl
-            JOIN "user" transition_user ON ttl.transition_by = transition_user.id
-            WHERE ttl.test_case_id = ${testCases.id}),
-            '[]'::json
-          )
-        )
-      `.as("result"),
-      })
-      .from(testCases)
-      .innerJoin(user, eq(testCases.createdBy, user.id))
-      .where(eq(testCases.id, testCaseId));
+    const [result] = await getTestCaseFullDetail(testCaseId);
+
+    if (!result?.result) {
+      throw new HTTPException(404, {
+        message: "Test case not found",
+      });
+    }
+
+    return c.json(result.result, 200);
+  })
+  .openapi(testCaseRoutes.editTestCaseByTestCaseId, async (c) => {
+    const user = c.get("user")!;
+    const { testCaseId } = c.req.valid("param");
+    const body = c.req.valid("json");
+
+    if (user.role === "tester") {
+      if (body.action !== "tester-update") {
+        throw new HTTPException(403, {
+          message: "You are not authorized to edit this test case",
+        });
+      }
+      const isAssigned = await db.$count(
+        testCaseAssignments,
+        and(
+          eq(testCaseAssignments.testCaseId, testCaseId),
+          eq(testCaseAssignments.testerId, c.get("user")!.id),
+        ),
+      );
+
+      if (!isAssigned) {
+        throw new HTTPException(403, {
+          message: "You are not assigned to this test case",
+        });
+      }
+    }
+
+    const isExists = await db.$count(testCases, eq(testCases.id, testCaseId));
+
+    if (!isExists) {
+      throw new HTTPException(404, {
+        message: "Test case not found",
+      });
+    }
+
+    await db.transaction(async (trx) => {
+      switch (body.action) {
+        case "edit": {
+          const { title, description, supportUpdate } = body;
+          await trx
+            .update(testCases)
+            .set({
+              title: sentenceCase(title),
+              description,
+              supportUpdate,
+            })
+            .where(eq(testCases.id, testCaseId));
+
+          await trx.insert(testCaseTransitionLogs).values({
+            testCaseId,
+            transitionBy: user.id,
+            transitionStatus: "edited",
+            transitionAt: new Date(),
+            transitionComment: `Edited by ${user.name}`,
+          });
+
+          if (supportUpdate) {
+            await trx.insert(testCaseTransitionLogs).values({
+              testCaseId,
+              transitionBy: user.id,
+              transitionStatus: supportUpdate,
+              transitionAt: new Date(),
+              transitionComment: `Support update by ${user.name} to ${supportUpdate}`,
+            });
+          }
+          break;
+        }
+        case "support-update": {
+          const { supportUpdate } = body;
+          await trx
+            .update(testCases)
+            .set({
+              supportUpdate,
+            })
+            .where(eq(testCases.id, testCaseId));
+
+          await trx.insert(testCaseTransitionLogs).values({
+            testCaseId,
+            transitionBy: user.id,
+            transitionStatus: supportUpdate,
+            transitionAt: new Date(),
+            transitionComment: `Support update by ${user.name} to ${supportUpdate}`,
+          });
+          break;
+        }
+        case "tester-update": {
+          const { testerUpdate } = body;
+          await trx
+            .update(testCases)
+            .set({
+              testerUpdate,
+            })
+            .where(eq(testCases.id, testCaseId));
+
+          await trx.insert(testCaseTransitionLogs).values({
+            testCaseId,
+            transitionBy: user.id,
+            transitionStatus: testerUpdate,
+            transitionAt: new Date(),
+            transitionComment: `Tester update by ${user.name} to ${testerUpdate}`,
+          });
+          break;
+        }
+      }
+    });
+
+    const [result] = await getTestCaseFullDetail(testCaseId);
 
     if (!result?.result) {
       throw new HTTPException(404, {

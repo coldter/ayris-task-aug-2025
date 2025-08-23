@@ -68,3 +68,23 @@ export const getFullTestCaseDetailsByTestCaseIdResponseSchema = z.object({
   assignedTesters: z.array(userSchema),
   transitionTimeline: z.array(transitionTimelineEntrySchema),
 });
+
+export const editTestCaseByTestCaseIdRequestSchema = z.discriminatedUnion(
+  "action",
+  [
+    z.object({
+      action: z.literal("edit"),
+      title: z.string(),
+      description: z.string(),
+      supportUpdate: z.enum(supportUpdateEnum).optional(),
+    }),
+    z.object({
+      action: z.literal("support-update"),
+      supportUpdate: z.enum(supportUpdateEnum),
+    }),
+    z.object({
+      action: z.literal("tester-update"),
+      testerUpdate: z.enum(testerUpdateEnum),
+    }),
+  ],
+);

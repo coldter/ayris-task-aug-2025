@@ -6,6 +6,7 @@ import { checkRole } from "@/middlewares/guard/check-role";
 import {
   createTestCaseRequestSchema,
   createTestCaseResponseSchema,
+  editTestCaseByTestCaseIdRequestSchema,
   getAllTestCasesForTesterResponseSchema,
   getAllTestCasesGroupedByTestersResponseSchema,
   getFullTestCaseDetailsByTestCaseIdResponseSchema,
@@ -71,6 +72,43 @@ const testCaseRoutes = {
       params: z.object({
         testCaseId: z.string(),
       }),
+    },
+    responses: {
+      200: {
+        description: "Context entities",
+        content: {
+          "application/json": {
+            schema: getFullTestCaseDetailsByTestCaseIdResponseSchema,
+          },
+        },
+      },
+      ...commonErrorResponses,
+    },
+  }),
+
+  editTestCaseByTestCaseId: createRouteConfig({
+    operationId: "editTestCaseByTestCaseId",
+    method: "patch",
+    path: "/{testCaseId}",
+    guard: [
+      isAuthenticated,
+      checkRole({ role: ["superadmin", "support", "tester"] }),
+    ],
+    tags: ["test-case"],
+    summary: "Get full test case details by test case id",
+    description: "Returns full test case details by test case id",
+    request: {
+      params: z.object({
+        testCaseId: z.string(),
+      }),
+      body: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: editTestCaseByTestCaseIdRequestSchema,
+          },
+        },
+      },
     },
     responses: {
       200: {
