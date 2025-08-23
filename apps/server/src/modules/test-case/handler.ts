@@ -220,6 +220,7 @@ const testCaseHandler = app
             .update(testCases)
             .set({
               supportUpdate,
+              testerUpdate: supportUpdate === "retest" ? "pending" : undefined,
             })
             .where(eq(testCases.id, testCaseId));
 
