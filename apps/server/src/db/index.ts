@@ -1,20 +1,37 @@
-import { drizzle, type NodePgClient } from "drizzle-orm/node-postgres";
+import {
+  drizzle as drizzleNodePg,
+  type NodePgClient,
+} from "drizzle-orm/node-postgres";
 import { logger } from "@/lib/logger";
 import { DrizzleLogger } from "@/lib/logger-drizzle";
 import * as schema from "./schema";
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 
-export const db = drizzle({
-  schema,
-  logger: process.env.NODE_ENV === "development" ? new DrizzleLogger() : false,
-  connection: {
-    connectionString: process.env.DATABASE_URL,
-    connectionTimeoutMillis: 10000,
-    idleTimeoutMillis: 30000,
-    max: 10,
-    min: 0,
-  },
-  casing: "snake_case",
-});
+export const db =
+  process.env.DATABASE_CONNECTOR !== "neon"
+    ? drizzleNodePg({
+        schema,
+        logger:
+          process.env.NODE_ENV === "development" ? new DrizzleLogger() : false,
+        connection: {
+          connectionString: process.env.DATABASE_URL,
+          connectionTimeoutMillis: 10000,
+          idleTimeoutMillis: 30000,
+          max: 10,
+          min: 0,
+        },
+        casing: "snake_case",
+      })
+    : drizzleNeon({
+        schema,
+        logger:
+          process.env.NODE_ENV === "development" ? new DrizzleLogger() : false,
+        connection: {
+          connectionString: process.env.DATABASE_URL,
+          connectionTimeoutMillis: 10000,
+          idleTimeoutMillis: 30000,
+        },
+      });
 
 export async function checkDbConnection(pool: NodePgClient): Promise<void> {
   const client = await pool.connect().catch((err) => {

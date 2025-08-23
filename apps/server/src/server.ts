@@ -9,7 +9,7 @@ import { handleError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import { authContextMiddleware } from "@/middlewares/auth-context";
 
-const baseApp = new OpenAPIHono<Env>();
+const baseApp = new OpenAPIHono<Env>().basePath(process.env.BASE_PATH || "");
 
 baseApp.use(trimTrailingSlash());
 baseApp.use(
