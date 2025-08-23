@@ -192,7 +192,7 @@ export function TestCaseDetails({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
-                    <StatusBadge status={testCase.testerUpdate} type="tester" />
+                    <StatusBadge status={testCase.testerUpdate} />
                     {isEditing ? (
                       <Select
                         value={editedSupportUpdate}
@@ -209,10 +209,7 @@ export function TestCaseDetails({
                         </SelectContent>
                       </Select>
                     ) : (
-                      <StatusBadge
-                        status={testCase.supportUpdate}
-                        type="support"
-                      />
+                      <StatusBadge status={testCase.supportUpdate} />
                     )}
                   </div>
 

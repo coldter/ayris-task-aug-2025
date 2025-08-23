@@ -66,16 +66,8 @@ export function CreateTestCase({
     description?: string;
   }>({});
 
-  // Mock data for demonstration - in real app this would come from props
-  const mockTesters: Tester[] =
-    availableTesters.length > 0
-      ? availableTesters
-      : [
-          { id: "tester1", name: "John Doe", email: "john@example.com" },
-          { id: "tester2", name: "Jane Smith", email: "jane@example.com" },
-          { id: "tester3", name: "Mike Johnson", email: "mike@example.com" },
-          { id: "tester4", name: "Sarah Wilson", email: "sarah@example.com" },
-        ];
+  // Use available testers from props, fallback to empty array
+  const mockTesters: Tester[] = availableTesters;
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
@@ -133,7 +125,7 @@ export function CreateTestCase({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50">
       <div className="mx-auto max-w-5xl space-y-8 p-6">
-        <Card className="border-0 bg-white/80 shadow-lg backdrop-blur-sm">
+        <Card className="overflow-visible border-0 bg-white/80 shadow-lg backdrop-blur-sm">
           <CardHeader className="pb-6">
             <div className="flex items-start justify-between">
               <div className="flex-1 space-y-4">
@@ -293,7 +285,7 @@ export function CreateTestCase({
                 >
                   Test Case Description *
                 </Label>
-                <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-6">
+                <div className="overflow-visible rounded-lg border border-slate-200 bg-slate-50/50 p-6">
                   <WysiwygEditor
                     content={description}
                     onChange={(html, json) => {

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRpc } from "./api-client";
 
 const BACKEND_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
@@ -48,5 +48,48 @@ export const useTestCasesGroupedByTesters = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useAvailableTesters = () => {
+  return useQuery({
+    queryKey: ["available-testers"],
+    queryFn: async () => {
+      const response = await apiRpc.api.tester["short-info-list"].$get();
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes - testers don't change frequently
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useCreateTestCase = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      title: string;
+      testerIds: string[];
+      description: string;
+    }) => {
+      const response = await apiRpc.api["test-case"].$post({
+        json: data,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch test cases data after creation
+      queryClient.invalidateQueries({ queryKey: ["test-cases-grouped"] });
+    },
   });
 };

@@ -29,15 +29,24 @@ const ToolbarButton = ({
   children: React.ReactNode;
   title: string;
 }) => (
-  <Button
-    variant={isActive ? "default" : "ghost"}
-    size="sm"
-    onClick={onClick}
-    title={title}
-    className="h-8 w-8 p-0"
-  >
-    {children}
-  </Button>
+  <div className="group relative inline-block">
+    <Button
+      type="button"
+      variant={isActive ? "default" : "ghost"}
+      size="sm"
+      onClick={onClick}
+      aria-label={title}
+      className="h-8 w-8 p-0"
+    >
+      {children}
+    </Button>
+    {/* Custom tooltip */}
+    <div className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-[999] mb-2 transform whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-white text-xs opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+      {title}
+      {/* Arrow */}
+      <div className="-translate-x-1/2 absolute top-full left-1/2 transform border-4 border-transparent border-t-gray-900" />
+    </div>
+  </div>
 );
 
 interface WysiwygEditorProps {
@@ -95,9 +104,9 @@ export function WysiwygEditor({
   }
 
   return (
-    <div className={`rounded-md border ${className}`}>
+    <div className={`overflow-visible rounded-md border ${className}`}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b p-2">
+      <div className="relative flex flex-wrap items-center gap-1 overflow-visible border-b p-2">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           isActive={editor.isActive("bold")}

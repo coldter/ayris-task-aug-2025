@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { CreateTestCase } from "@/components/test-case-management/create-test-case";
+import { TestCaseHeader } from "@/components/test-case-management/test-case-header";
 import { TesterCard } from "@/components/test-case-management/tester-card";
-import { useTestCasesGroupedByTesters } from "@/lib/api";
+import {
+  useAvailableTesters,
+  useCreateTestCase,
+  useTestCasesGroupedByTesters,
+} from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/dashboard")({
@@ -17,12 +24,21 @@ function RouteComponent() {
     new Set(),
   );
 
+  // State for create test case modal
+  const [showCreateTestCase, setShowCreateTestCase] = useState(false);
+
   // Fetch test cases for supporters
   const {
     data: testCasesData,
     isLoading: isTestCasesLoading,
     error: testCasesError,
   } = useTestCasesGroupedByTesters();
+
+  // Fetch available testers for test case creation
+  const { data: availableTestersData } = useAvailableTesters();
+
+  // Create test case mutation
+  const createTestCaseMutation = useCreateTestCase();
 
   useEffect(() => {
     if (!session && !isPending) {
@@ -49,9 +65,33 @@ function RouteComponent() {
     console.log("Update support status:", testCaseId, status);
   };
 
-  const handleUpdateTestCase = (testCaseId: string, newTitle: string) => {
-    // TODO: Implement API call to update test case title
-    console.log("Update test case title:", testCaseId, newTitle);
+  const handleNewTestCase = () => {
+    setShowCreateTestCase(true);
+  };
+
+  const handleCreateTestCase = async (testCase: {
+    title: string;
+    testerIds: string[];
+    description: string;
+    descriptionJson: object;
+  }) => {
+    try {
+      await createTestCaseMutation.mutateAsync({
+        title: testCase.title,
+        testerIds: testCase.testerIds,
+        description: testCase.description,
+      });
+
+      toast.success("Test case created successfully!");
+      setShowCreateTestCase(false);
+    } catch (error) {
+      console.error("Failed to create test case:", error);
+      toast.error("Failed to create test case. Please try again.");
+    }
+  };
+
+  const handleCancelCreate = () => {
+    setShowCreateTestCase(false);
   };
 
   if (isPending) {
@@ -92,14 +132,21 @@ function RouteComponent() {
   }
 
   if (session?.user.role === "support") {
+    // Show create test case form if in create mode
+    if (showCreateTestCase) {
+      return (
+        <CreateTestCase
+          onSubmit={handleCreateTestCase}
+          onCancel={handleCancelCreate}
+          availableTesters={availableTestersData?.testers || []}
+          isLoading={createTestCaseMutation.isPending}
+        />
+      );
+    }
+
     return (
       <div className="container mx-auto max-w-7xl px-4 py-6">
-        <div className="mb-6">
-          <h1 className="mb-2 font-bold text-3xl">Test Case Management</h1>
-          <p className="text-muted-foreground">
-            Manage and review test cases assigned to testers
-          </p>
-        </div>
+        <TestCaseHeader onNewTestCase={handleNewTestCase} />
 
         {isTestCasesLoading && (
           <div className="flex justify-center py-8">
@@ -139,7 +186,6 @@ function RouteComponent() {
                   isExpanded={expandedTesters.has(tester.id)}
                   onToggleExpansion={handleToggleExpansion}
                   onUpdateSupportStatus={handleUpdateSupportStatus}
-                  onUpdateTestCase={handleUpdateTestCase}
                 />
               ))}
             </div>

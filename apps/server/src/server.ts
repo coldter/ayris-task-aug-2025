@@ -36,10 +36,13 @@ baseApp.get("/ping", async (c) => {
     isDbOk = true;
   }
 
-  return c.json({
-    message: `pong::dbStatus=${isDbOk ? "ok" : "error"}`,
-    dbStatus: isDbOk,
-  });
+  return c.json(
+    {
+      message: `pong::dbStatus=${isDbOk ? "ok" : "error"}`,
+      dbStatus: isDbOk,
+    },
+    isDbOk ? 200 : 500,
+  );
 });
 
 baseApp.use(authContextMiddleware);
