@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger as httpLogger } from "hono/logger";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import { db } from "@/db";
 import type { Env } from "@/lib/context";
 import { handleError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
@@ -27,7 +28,19 @@ baseApp.use(
   }),
 );
 
-baseApp.get("/ping", (c) => c.text("pong"));
+baseApp.get("/ping", async (c) => {
+  const dbResponse = await db.$client.query("SELECT 1 AS one");
+
+  let isDbOk = false;
+  if (dbResponse?.rows[0]?.one === 1) {
+    isDbOk = true;
+  }
+
+  return c.json({
+    message: `pong::dbStatus=${isDbOk ? "ok" : "error"}`,
+    dbStatus: isDbOk,
+  });
+});
 
 baseApp.use(authContextMiddleware);
 
