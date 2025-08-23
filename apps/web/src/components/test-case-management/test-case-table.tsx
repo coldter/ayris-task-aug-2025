@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -6,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EditableTestCaseTitle } from "./editable-test-case-title";
 import { StatusBadge } from "./status-badge";
 
 interface TestCase {
@@ -19,13 +20,13 @@ interface TestCase {
 interface TestCaseTableProps {
   testCases: TestCase[];
   onUpdateSupportStatus?: (testCaseId: string, status: string) => void;
-  onUpdateTestCase?: (testCaseId: string, newTitle: string) => void;
+  onViewTestCase?: (testCaseId: string) => void;
 }
 
 export function TestCaseTable({
   testCases,
   onUpdateSupportStatus,
-  onUpdateTestCase,
+  onViewTestCase,
 }: TestCaseTableProps) {
   return (
     <div className="overflow-x-auto">
@@ -53,16 +54,16 @@ export function TestCaseTable({
           {testCases.map((testCase) => (
             <tr key={testCase.id} className="hover:bg-gray-50">
               <td className="px-6 py-4">
-                <span className="font-mono font-semibold text-blue-600 text-sm">
+                <button
+                  type="button"
+                  onClick={() => onViewTestCase?.(testCase.id)}
+                  className="font-mono font-semibold text-blue-600 text-sm hover:text-blue-800 hover:underline"
+                >
                   {testCase.id}
-                </span>
+                </button>
               </td>
               <td className="px-6 py-4">
-                <EditableTestCaseTitle
-                  title={testCase.title}
-                  testCaseId={testCase.id}
-                  onSave={onUpdateTestCase}
-                />
+                <span className="text-gray-900 text-sm">{testCase.title}</span>
               </td>
               <td className="px-6 py-4">
                 <StatusBadge status={testCase.testerUpdate} />
@@ -78,13 +79,9 @@ export function TestCaseTable({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending_validation">
-                      Pending Validation
-                    </SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="passed">Passed</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
-                    <SelectItem value="retest">Retest</SelectItem>
-                    <SelectItem value="na">N/A</SelectItem>
                   </SelectContent>
                 </Select>
               </td>
@@ -92,8 +89,9 @@ export function TestCaseTable({
                 <Button
                   variant="link"
                   className="p-0 text-blue-600 hover:text-blue-800"
+                  onClick={() => onViewTestCase?.(testCase.id)}
                 >
-                  Update
+                  View Details
                 </Button>
               </td>
             </tr>

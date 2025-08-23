@@ -59,8 +59,11 @@ const testCaseRoutes = {
   getFullTestCaseDetailsByTestCaseId: createRouteConfig({
     operationId: "getFullTestCaseDetailsByTestCaseId",
     method: "get",
-    path: "/:testCaseId",
-    guard: [isAuthenticated, checkRole({ role: ["superadmin", "support"] })],
+    path: "/{testCaseId}",
+    guard: [
+      isAuthenticated,
+      checkRole({ role: ["superadmin", "support", "tester"] }),
+    ],
     tags: ["test-case"],
     summary: "Get full test case details by test case id",
     description: "Returns full test case details by test case id",

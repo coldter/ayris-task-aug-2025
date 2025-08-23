@@ -1,4 +1,3 @@
-"use client";
 import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -24,7 +23,7 @@ interface TesterCardProps {
   isExpanded?: boolean;
   onToggleExpansion?: (testerId: string) => void;
   onUpdateSupportStatus?: (testCaseId: string, status: string) => void;
-  onUpdateTestCase?: (testCaseId: string, newTitle: string) => void;
+  onViewTestCase?: (testCaseId: string) => void;
 }
 
 export function TesterCard({
@@ -32,13 +31,13 @@ export function TesterCard({
   isExpanded = false,
   onToggleExpansion,
   onUpdateSupportStatus,
-  onUpdateTestCase,
+  onViewTestCase,
 }: TesterCardProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
       <button
         type="button"
-        className="flex w-full cursor-pointer items-center justify-between border-gray-200 border-b p-4 text-left hover:bg-gray-50"
+        className="flex w-full cursor-pointer items-center justify-between border-gray-200 border-b p-4 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
         onClick={() => onToggleExpansion?.(tester.id)}
       >
         <div className="flex items-center gap-3">
@@ -67,7 +66,7 @@ export function TesterCard({
         <TestCaseTable
           testCases={tester.testCases}
           onUpdateSupportStatus={onUpdateSupportStatus}
-          onUpdateTestCase={onUpdateTestCase}
+          onViewTestCase={onViewTestCase}
         />
       )}
     </div>
