@@ -11,15 +11,17 @@ showRoutes(app, {
   // verbose: true,
 });
 
-serve(
-  {
-    fetch: app.fetch,
-    port: Number.parseInt(process.env.PORT || "3000", 10),
-  },
-  (info) => {
-    logger.info(`Server is running on http://localhost:${info.port}`);
-    logger.info(`Server is running on http://localhost:${info.port}`);
-  },
-);
+if (!process.env.VERCEL) {
+  serve(
+    {
+      fetch: app.fetch,
+      port: Number.parseInt(process.env.PORT || "3000", 10),
+    },
+    (info) => {
+      logger.info(`Server is running on http://localhost:${info.port}`);
+      logger.info(`Server is running on http://localhost:${info.port}`);
+    },
+  );
+}
 
 export default app;

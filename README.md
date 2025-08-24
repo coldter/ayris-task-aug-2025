@@ -1,5 +1,17 @@
 # ayris-task
 
+## Requirements
+
+[Task Definition PDF](./task.pdf)
+
+## Deployment
+
+URL: [https://ayris-task.vercel.app/](https://ayris-task.vercel.app/)
+
+API Docs: [https://ayris-task.vercel.app/edge/docs](https://ayris-task.vercel.app/edge/docs)
+
+Auth API Docs(Better-Auth): [https://ayris-task.vercel.app/edge/docs/auth](https://ayris-task.vercel.app/edge/docs/auth)
+
 ## Getting Started
 
 This project uses PostgreSQL with Drizzle ORM.

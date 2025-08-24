@@ -37,8 +37,12 @@ export const docs = (app: OpenAPIHono<Env>, enable: boolean) => {
       customCss: customCss,
       servers: [
         {
-          url: `${c.req.url.replace(/\/docs*$/, "")}`,
+          url: `${new URL(c.req.url).origin}`,
           description: "Current",
+        },
+        {
+          url: `${c.req.url.replace(/\/docs*$/, "/api")}`,
+          description: "Current_With_Params",
         },
         {
           url: "http://localhost:3000",
@@ -65,8 +69,12 @@ export const docs = (app: OpenAPIHono<Env>, enable: boolean) => {
       customCss: customCss,
       servers: [
         {
-          url: `${c.req.url.replace(/\/docs\/auth*$/, "/api/auth")}`,
+          url: `${new URL(c.req.url).origin}`,
           description: "Current",
+        },
+        {
+          url: `${c.req.url.replace(/\/docs\/auth*$/, "/api/auth")}`,
+          description: "Current_With_Params",
         },
         {
           url: "http://localhost:3000/api/auth",
