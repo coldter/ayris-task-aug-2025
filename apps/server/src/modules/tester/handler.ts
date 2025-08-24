@@ -4,8 +4,9 @@ import { db } from "@/db";
 import { user } from "@/db/schema";
 import type { Env } from "@/lib/context";
 import testerRoutes from "@/modules/tester/routes";
+import { defaultHook } from "@/utils/default-hook";
 
-const app = new OpenAPIHono<Env>();
+const app = new OpenAPIHono<Env>({ defaultHook });
 
 const testerHandler = app.openapi(testerRoutes.getAllTesterInfo, async (c) => {
   const testers = await db

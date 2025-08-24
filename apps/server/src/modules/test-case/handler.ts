@@ -13,8 +13,9 @@ import type { Env } from "@/lib/context";
 import testCaseRoutes from "@/modules/test-case/routes";
 import type { getAllTestCasesGroupedByTestersResponseSchema } from "@/modules/test-case/schema";
 import { getTestCaseFullDetail } from "@/modules/test-case/servies";
+import { defaultHook } from "@/utils/default-hook";
 
-const app = new OpenAPIHono<Env>();
+const app = new OpenAPIHono<Env>({ defaultHook });
 
 const testCaseHandler = app
   .openapi(testCaseRoutes.getAllTestCasesGroupedByTesters, async (c) => {
