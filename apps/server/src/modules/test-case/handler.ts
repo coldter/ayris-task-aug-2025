@@ -35,7 +35,7 @@ const testCaseHandler = app
             'title', ${testCases.title},
             'testerUpdate', ${testCases.testerUpdate},
             'supportUpdate', ${testCases.supportUpdate}
-          )
+          ) order by "test_cases".created_at asc
         ) FILTER (WHERE ${testCases.id} IS NOT NULL),
         '[]'::json
       )
@@ -45,7 +45,7 @@ const testCaseHandler = app
       .leftJoin(testCaseAssignments, eq(user.id, testCaseAssignments.testerId))
       .leftJoin(testCases, eq(testCaseAssignments.testCaseId, testCases.id))
       .where(eq(user.role, "tester"))
-      .groupBy(user.id, user.name, user.email)
+      .groupBy(user.id, user.name, user.email, user.createdAt)
       .orderBy(asc(user.createdAt));
 
     return c.json({ testers: result }, 200);
